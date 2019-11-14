@@ -16,6 +16,7 @@ const REGISTER_ADD: u8 = 0x4 as u8;
 const REGISTER_SUB: u8 = 0x5 as u8;
 const REGISTER_SHIFT_RIGHT: u8 = 0x6 as u8;
 const REGISTER_SUBN: u8 = 0x7 as u8;
+const REGISTER_SHIFT_LEFT: u8 = 0xE as u8;
 
 pub struct CPU {
     registers: [u8; 16],
@@ -54,8 +55,8 @@ impl CPU {
             let op = op_byte_1 << 8 | op_byte_2;
 
             let op_code = ((op & 0xF000) >> 12) as u8;
-            let reg_x = ((op & 0x0F00) >> 8) as u8;
-            let reg_y = ((op & 0x00F0) >> 4) as u8;
+            let x = ((op & 0x0F00) >> 8) as u8;
+            let y = ((op & 0x00F0) >> 4) as u8;
 
             self.cur_pos += 2;
 
@@ -68,14 +69,15 @@ impl CPU {
                     let op_action = (op & 0x000F) as u8;
 
                     match op_action {
-                        REGISTER_STORE => { self.copy(reg_x as usize, reg_y as usize); },
-                        REGISTER_OR => { self.or(reg_x as usize, reg_y as usize); },
-                        REGISTER_AND => { self.and(reg_x as usize, reg_y as usize); },
-                        REGISTER_XOR => { self.xor(reg_x as usize, reg_y as usize); },
-                        REGISTER_ADD => { self.add(reg_x as usize, reg_y as usize); },
-                        REGISTER_SUB => { self.sub(reg_x as usize, reg_y as usize); },
-                        REGISTER_SHIFT_RIGHT => { self.shift_right(reg_x as usize, reg_y as usize); },
-                        REGISTER_SUBN => { self.subn(reg_x as usize, reg_y as usize); },
+                        REGISTER_STORE => { self.copy(x as usize, y as usize); },
+                        REGISTER_OR => { self.or(x as usize, y as usize); },
+                        REGISTER_AND => { self.and(x as usize, y as usize); },
+                        REGISTER_XOR => { self.xor(x as usize, y as usize); },
+                        REGISTER_ADD => { self.add(x as usize, y as usize); },
+                        REGISTER_SUB => { self.sub(x as usize, y as usize); },
+                        REGISTER_SHIFT_RIGHT => { self.shift_right(x as usize, y as usize); },
+                        REGISTER_SUBN => { self.subn(x as usize, y as usize); },
+                        REGISTER_SHIFT_LEFT => { self.shift_left(x as usize, y as usize); },
                         _ => unimplemented!("No imple for {:04x} - {:04x}", op_code, op_action),
                     }
 

@@ -41,6 +41,11 @@ impl CPU {
         self.registers[15] = self.registers[y] & 1;
         self.registers[x] = self.registers[y] >> 1;
     }
+
+    pub(super) fn shift_left(&mut self, x: usize, y: usize) {
+        self.registers[15] = (self.registers[y] & 0b10000000) >> 7;
+        self.registers[x] = self.registers[y] << 1;
+    }
 }
 
 #[cfg(test)]
@@ -287,6 +292,48 @@ mod tests {
         chip8.run();
         assert_eq!(chip8.registers[0], 255);
         assert_eq!(chip8.registers[1], 0);
+        assert_eq!(chip8.registers[15], 0);
+    }
+
+    #[test]
+    fn test_shift_left_one_most_significant_bit() {
+        let mut chip8 = CPU::new();
+        let mut test = chip8.blank_program();
+
+        chip8.registers[0] = 0b10011101;
+        chip8.registers[1] = 0b11011100;
+
+        test[0] = 0x80 as u8; test[1] = 0x1E as u8;
+
+        chip8.load(test);
+        assert_eq!(chip8.registers[0], 0b10011101);
+        assert_eq!(chip8.registers[1], 0b11011100);
+        assert_eq!(chip8.registers[15], 0);
+
+        chip8.run();
+        assert_eq!(chip8.registers[0], 0b10111000);
+        assert_eq!(chip8.registers[1], 0b11011100);
+        assert_eq!(chip8.registers[15], 1);
+    }
+
+    #[test]
+    fn test_shift_left_zero_most_significant_bit() {
+        let mut chip8 = CPU::new();
+        let mut test = chip8.blank_program();
+
+        chip8.registers[0] = 0b10011101;
+        chip8.registers[1] = 0b01011101;
+
+        test[0] = 0x80 as u8; test[1] = 0x1E as u8;
+
+        chip8.load(test);
+        assert_eq!(chip8.registers[0], 0b10011101);
+        assert_eq!(chip8.registers[1], 0b01011101);
+        assert_eq!(chip8.registers[15], 0);
+
+        chip8.run();
+        assert_eq!(chip8.registers[0], 0b10111010);
+        assert_eq!(chip8.registers[1], 0b01011101);
         assert_eq!(chip8.registers[15], 0);
     }
 }
