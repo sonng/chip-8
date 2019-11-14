@@ -10,6 +10,7 @@ const END_PROGRAM: u8 = 0x0 as u8;
 const REGISTER_OPERATION: u8 = 0x8 as u8;
 const REGISTER_STORE: u8 = 0x0 as u8;
 const REGISTER_OR: u8 = 0x1 as u8;
+const REGISTER_AND: u8 = 0x2 as u8;
 
 pub struct CPU {
     registers: [u8; 16],
@@ -64,6 +65,7 @@ impl CPU {
                     match op_action {
                         REGISTER_STORE => { self.copy(reg_x as usize, reg_y as usize); },
                         REGISTER_OR => { self.or(reg_x as usize, reg_y as usize); },
+                        REGISTER_AND => { self.and(reg_x as usize, reg_y as usize); },
                         _ => unimplemented!("No imple for {:04x} - {:04x}", op_code, op_action),
                     }
 
