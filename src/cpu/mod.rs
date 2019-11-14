@@ -1,9 +1,11 @@
 mod register_operations;
 
+use std::fmt;
 use self::register_operations::*;
 
 const PROGRAM_START_ADDR: usize = 0x200 as usize;
 
+const END_PROGRAM: u8 = 0x0 as u8;
 // Register Operations
 const REGISTER_OPERATION: u8 = 0x8 as u8;
 const REGISTER_STORE: u8 = 0x0 as u8;
@@ -36,7 +38,8 @@ impl CPU {
     pub fn run(&mut self) {
         loop {
             if self.cur_pos >= self.memory.len() {
-                panic!("Current Position overflows");
+                println!("End of memory, exiting..\n");
+                return;
             }
 
             let op_byte_1 = self.memory[self.cur_pos] as u16;
@@ -50,6 +53,10 @@ impl CPU {
             self.cur_pos += 2;
 
             match op_code {
+                END_PROGRAM => {
+                    println!("0x0 op code at {:04x}, exiting now..\n", self.cur_pos);
+                    return;
+                },
                 REGISTER_OPERATION => {
                     let op_action = (op & 0x000F) as u8;
 

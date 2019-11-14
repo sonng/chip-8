@@ -6,3 +6,26 @@ impl CPU {
         self.registers[x] = self.registers[y];
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_copy_register() {
+        let mut chip8 = CPU::new();
+        let mut test = chip8.blank_program();
+
+        chip8.registers[1] = 5;
+        
+        test[0] = 0x80 as u8; test[1] = 0x10 as u8;
+
+        chip8.load(test);
+        assert_eq!(chip8.registers[0], 0);
+        assert_eq!(chip8.registers[1], 5);
+
+        chip8.run();
+        assert_eq!(chip8.registers[0], 5);
+        assert_eq!(chip8.registers[1], 5);
+    }
+}
