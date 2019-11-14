@@ -14,6 +14,7 @@ const REGISTER_AND: u8 = 0x2 as u8;
 const REGISTER_XOR: u8 = 0x3 as u8;
 const REGISTER_ADD: u8 = 0x4 as u8;
 const REGISTER_SUB: u8 = 0x5 as u8;
+const REGISTER_SHIFT_RIGHT: u8 = 0x6 as u8;
 
 pub struct CPU {
     registers: [u8; 16],
@@ -72,6 +73,7 @@ impl CPU {
                         REGISTER_XOR => { self.xor(reg_x as usize, reg_y as usize); },
                         REGISTER_ADD => { self.add(reg_x as usize, reg_y as usize); },
                         REGISTER_SUB => { self.sub(reg_x as usize, reg_y as usize); },
+                        REGISTER_SHIFT_RIGHT => { self.shift_right(reg_x as usize, reg_y as usize); },
                         _ => unimplemented!("No imple for {:04x} - {:04x}", op_code, op_action),
                     }
 

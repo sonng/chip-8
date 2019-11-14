@@ -13,11 +13,11 @@ impl CPU {
         self.registers[x] = self.registers[x] & self.registers[y]
     }
 
-    pub (super) fn xor(&mut self, x: usize, y: usize) {
+    pub(super) fn xor(&mut self, x: usize, y: usize) {
         self.registers[x] = self.registers[x] ^ self.registers[y]
     }
 
-    pub (super) fn add(&mut self, x: usize, y: usize) {
+    pub(super) fn add(&mut self, x: usize, y: usize) {
         let result = (self.registers[x] as u16) + 
             (self.registers[y] as u16);
 
@@ -25,10 +25,15 @@ impl CPU {
         self.registers[15] = if result > 255 { 1 } else { 0 };
     }
 
-    pub (super) fn sub(&mut self, x: usize, y: usize) {
+    pub(super) fn sub(&mut self, x: usize, y: usize) {
         self.registers[15] = if self.registers[x] > self.registers[y] { 1 } else { 0 };
         self.registers[x] = ((self.registers[x] as i16) - 
             (self.registers[y] as i16)) as u8;
+    }
+
+    pub(super) fn shift_right(&mut self, x: usize, y: usize) {
+        self.registers[15] = self.registers[y] & 1;
+        self.registers[x] = self.registers[y] >> 1;
     }
 }
 
@@ -193,5 +198,47 @@ mod tests {
         assert_eq!(chip8.registers[0], 255);
         assert_eq!(chip8.registers[1], 1);
         assert_eq!(chip8.registers[15], 0);
+    }
+
+    #[test]
+    fn test_shift_right_zero_least_significant_bit() {
+        let mut chip8 = CPU::new();
+        let mut test = chip8.blank_program();
+
+        chip8.registers[0] = 0b10011001 as u8;
+        chip8.registers[1] = 0b10110110 as u8;
+
+        test[0] = 0x80 as u8; test[1] = 0x16 as u8;
+
+        chip8.load(test);
+        assert_eq!(chip8.registers[0], 0b10011001);
+        assert_eq!(chip8.registers[1], 0b10110110);
+        assert_eq!(chip8.registers[15], 0);
+
+        chip8.run();
+        assert_eq!(chip8.registers[0], 0b01011011);
+        assert_eq!(chip8.registers[1], 0b10110110);
+        assert_eq!(chip8.registers[15], 0);
+    }
+
+    #[test]
+    fn test_shift_right_one_least_significant_bit() {
+        let mut chip8 = CPU::new();
+        let mut test = chip8.blank_program();
+
+        chip8.registers[0] = 0b10011001 as u8;
+        chip8.registers[1] = 0b10110111 as u8;
+
+        test[0] = 0x80 as u8; test[1] = 0x16 as u8;
+
+        chip8.load(test);
+        assert_eq!(chip8.registers[0], 0b10011001);
+        assert_eq!(chip8.registers[1], 0b10110111);
+        assert_eq!(chip8.registers[15], 0);
+
+        chip8.run();
+        assert_eq!(chip8.registers[0], 0b01011011);
+        assert_eq!(chip8.registers[1], 0b10110111);
+        assert_eq!(chip8.registers[15], 1);
     }
 }
