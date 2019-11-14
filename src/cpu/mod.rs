@@ -1,4 +1,12 @@
+mod register_operations;
+
+use self::register_operations::*;
+
 const PROGRAM_START_ADDR: usize = 0x200 as usize;
+
+// Register Operations
+const REGISTER_OPERATION: u8 = 0x8 as u8;
+const REGISTER_STORE: u8 = 0x0 as u8;
 
 pub struct CPU {
     registers: [u8; 16],
@@ -9,6 +17,10 @@ pub struct CPU {
 impl CPU {
     pub fn new() -> Self {
         CPU { registers: [0; 16], memory: [0; 4096], cur_pos: 0 }
+    }
+
+    pub fn blank_program(&mut self) -> [u8; 3176] {
+        [0; 3176]
     }
 
     pub fn load(&mut self, program: [u8; 3176]) {
@@ -38,6 +50,15 @@ impl CPU {
             self.cur_pos += 2;
 
             match op_code {
+                REGISTER_OPERATION => {
+                    let op_action = (op & 0x000F) as u8;
+
+                    match op_action {
+                        REGISTER_STORE => { self.copy(reg_x as usize, reg_y as usize); },
+                        _ => unimplemented!("No imple for {:04x} - {:04x}", op_code, op_action),
+                    }
+
+                }
                 _ => unimplemented!("No imple for {:04x}", op_code),
             }
         }
