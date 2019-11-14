@@ -24,6 +24,12 @@ impl CPU {
         self.registers[x] = result as u8;
         self.registers[15] = if result > 255 { 1 } else { 0 };
     }
+
+    pub (super) fn sub(&mut self, x: usize, y: usize) {
+        self.registers[15] = if self.registers[x] > self.registers[y] { 1 } else { 0 };
+        self.registers[x] = ((self.registers[x] as i16) - 
+            (self.registers[y] as i16)) as u8;
+    }
 }
 
 #[cfg(test)]
@@ -145,5 +151,47 @@ mod tests {
         assert_eq!(chip8.registers[0], 0);
         assert_eq!(chip8.registers[1], 1);
         assert_eq!(chip8.registers[15], 1);
+    }
+
+    #[test]
+    fn test_sub_register_no_carry() {
+        let mut chip8 = CPU::new();
+        let mut test = chip8.blank_program();
+
+        chip8.registers[0] = 255;
+        chip8.registers[1] = 1;
+
+        test[0] = 0x80 as u8; test[1] = 0x15 as u8;
+
+        chip8.load(test);
+        assert_eq!(chip8.registers[0], 255);
+        assert_eq!(chip8.registers[1], 1);
+        assert_eq!(chip8.registers[15], 0);
+
+        chip8.run();
+        assert_eq!(chip8.registers[0], 254);
+        assert_eq!(chip8.registers[1], 1);
+        assert_eq!(chip8.registers[15], 1);
+    }
+
+    #[test]
+    fn test_sub_register_with_carry() {
+        let mut chip8 = CPU::new();
+        let mut test = chip8.blank_program();
+
+        chip8.registers[0] = 0;
+        chip8.registers[1] = 1;
+
+        test[0] = 0x80 as u8; test[1] = 0x15 as u8;
+
+        chip8.load(test);
+        assert_eq!(chip8.registers[0], 0);
+        assert_eq!(chip8.registers[1], 1);
+        assert_eq!(chip8.registers[15], 0);
+
+        chip8.run();
+        assert_eq!(chip8.registers[0], 255);
+        assert_eq!(chip8.registers[1], 1);
+        assert_eq!(chip8.registers[15], 0);
     }
 }
