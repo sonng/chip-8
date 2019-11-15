@@ -1,11 +1,14 @@
 mod register_operations;
+mod subroutine;
 
 use std::fmt;
 use self::register_operations::*;
 
 const PROGRAM_START_ADDR: usize = 0x200 as usize;
 
-const END_PROGRAM: u8 = 0x0 as u8;
+const MISC: u8 = 0x0 as u8;
+const SUBROUTINE: u8 = 0x2 as u8;
+const ENDROUTINE: u8 = 0xEE as u8;
 // Register Operations
 const REGISTER_OPERATION: u8 = 0x8 as u8;
 const REGISTER_STORE: u8 = 0x0 as u8;
@@ -21,12 +24,14 @@ const REGISTER_SHIFT_LEFT: u8 = 0xE as u8;
 pub struct CPU {
     registers: [u8; 16],
     memory: [u8; 4096],
-    cur_pos: usize
+    cur_pos: usize,
+    stack: [u16; 16],
+    cur_stack: usize,
 }
 
 impl CPU {
     pub fn new() -> Self {
-        CPU { registers: [0; 16], memory: [0; 4096], cur_pos: 0 }
+        CPU { registers: [0; 16], memory: [0; 4096], cur_pos: 0, stack: [0; 16], cur_stack: 0, }
     }
 
     pub fn blank_program(&mut self) -> [u8; 3176] {
@@ -61,9 +66,20 @@ impl CPU {
             self.cur_pos += 2;
 
             match op_code {
-                END_PROGRAM => {
-                    println!("0x0 op code at {:04x}, exiting now..\n", self.cur_pos);
-                    return;
+                MISC => {
+                    let misc_action = (op & 0x00FF) as u8;
+
+                    match misc_action {
+                        ENDROUTINE => { self.ret(); },
+                        _ => {
+                            println!("0x0 op code at {:04x}, exiting now..\n", self.cur_pos);
+                            return;
+                        },
+                    }
+                },
+                SUBROUTINE => {
+                    let addr = (op & 0x0FFF) as u16;
+                    self.call(addr);
                 },
                 REGISTER_OPERATION => {
                     let op_action = (op & 0x000F) as u8;
