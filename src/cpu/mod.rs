@@ -1,8 +1,8 @@
 mod register_operations;
 mod subroutine;
+mod comparison;
 
 use std::fmt;
-use self::register_operations::*;
 
 const PROGRAM_START_ADDR: usize = 0x200 as usize;
 
