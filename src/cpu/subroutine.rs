@@ -21,6 +21,10 @@ impl CPU {
         self.cur_pos = self.stack[self.cur_stack] as usize;
         self.stack[self.cur_stack] = 0;
     }
+
+    pub(super) fn jump(&mut self, addr: u16) {
+        self.cur_pos = addr as usize;
+    }
 }
 
 #[cfg(test)]
@@ -71,6 +75,27 @@ mod tests {
 
         chip8.load(test);
         chip8.run();
+    }
+
+    #[test]
+    fn test_jump() {
+        let mut chip8 = CPU::new();
+        let mut test = chip8.blank_program();
+
+        chip8.registers[0] = 5;
+        chip8.registers[1] = 6;
+
+        test[0] = 0x12 as u8; test[1] = 0x0C as u8;
+        test[2] = 0x80 as u8; test[3] = 0x14 as u8;
+        test[12] = 0x80 as u8; test[13] = 0x14 as u8;
+
+        chip8.load(test);
+        assert_eq!(chip8.registers[0], 5);
+        assert_eq!(chip8.registers[1], 6);
+
+        chip8.run();
+        assert_eq!(chip8.registers[0], 11);
+        assert_eq!(chip8.registers[1], 6);
     }
 }
 

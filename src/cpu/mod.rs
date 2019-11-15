@@ -9,6 +9,7 @@ const PROGRAM_START_ADDR: usize = 0x200 as usize;
 const MISC: u8 = 0x0 as u8;
 const SUBROUTINE: u8 = 0x2 as u8;
 const ENDROUTINE: u8 = 0xEE as u8;
+const JUMP: u8 = 0x1 as u8;
 // Register Operations
 const REGISTER_OPERATION: u8 = 0x8 as u8;
 const REGISTER_STORE: u8 = 0x0 as u8;
@@ -62,6 +63,7 @@ impl CPU {
             let op_code = ((op & 0xF000) >> 12) as u8;
             let x = ((op & 0x0F00) >> 8) as u8;
             let y = ((op & 0x00F0) >> 4) as u8;
+            let addr = (op & 0x0FFF) as u16;
 
             self.cur_pos += 2;
 
@@ -77,8 +79,10 @@ impl CPU {
                         },
                     }
                 },
+                JUMP => {
+                    self.jump(addr);
+                },
                 SUBROUTINE => {
-                    let addr = (op & 0x0FFF) as u16;
                     self.call(addr);
                 },
                 REGISTER_OPERATION => {
