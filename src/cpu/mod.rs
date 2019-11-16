@@ -12,6 +12,8 @@ const ENDROUTINE: u8 = 0xEE as u8;
 const JUMP: u8 = 0x1 as u8;
 const SKIP_IF_EQUAL: u8 = 0x3 as u8;
 const SKIP_IF_NOT_EQUAL: u8 = 0x4 as u8;
+const SKIP_IF_REGISTER_EQUAL: u8 = 0x5 as u8;
+const SKIP_IF_REGISTER_NOT_EQUAL: u8 = 0x9 as u8;
 // Register Operations
 const REGISTER_OPERATION: u8 = 0x8 as u8;
 const REGISTER_STORE: u8 = 0x0 as u8;
@@ -86,6 +88,8 @@ impl CPU {
                 SUBROUTINE => { self.call(addr); },
                 SKIP_IF_EQUAL => { self.skip_if_equal(x, value); },
                 SKIP_IF_NOT_EQUAL => { self.skip_if_not_equal(x, value); },
+                SKIP_IF_REGISTER_EQUAL => { self.skip_if_registers_equal(x, y); },
+                SKIP_IF_REGISTER_NOT_EQUAL => { self.skip_if_registers_not_equal(x, y); },
                 REGISTER_OPERATION => {
                     let op_action = (op & 0x000F) as u8;
 
