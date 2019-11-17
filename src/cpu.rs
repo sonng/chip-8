@@ -9,6 +9,7 @@ pub struct CPU {
     stack: [u16; 16],
     cur_stack: usize,
 }
+
 const PROGRAM_START_ADDR: usize = 0x200 as usize;
 
 const MISC: u8 = 0x0 as u8;
@@ -41,6 +42,10 @@ impl CPU {
         [0; 3176]
     }
 
+    fn advance_counter(&mut self) {
+        self.program_counter += 2;
+    }
+
     pub fn load(&mut self, program: [u8; 3176]) {
         let mut program_counter = PROGRAM_START_ADDR;
         for e in program.iter() {
@@ -68,7 +73,7 @@ impl CPU {
             let addr = (op & 0x0FFF) as u16;
             let byte = (op & 0x00FF) as u8;
 
-            self.program_counter += 2;
+            self.advance_counter();
 
             match op_code {
                 MISC => {
