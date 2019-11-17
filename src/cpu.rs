@@ -1,6 +1,7 @@
 mod comparison;
 mod subroutine;
 mod register_operations;
+mod register_i;
 
 pub struct CPU {
     registers: [u8; 16],
@@ -8,6 +9,7 @@ pub struct CPU {
     program_counter: usize,
     stack: [u16; 16],
     stack_pointer: usize,
+    i: u16,
 }
 
 const PROGRAM_START_ADDR: usize = 0x200 as usize;
@@ -19,9 +21,11 @@ const JUMP: u8 = 0x1 as u8;
 const SKIP_IF_EQUAL: u8 = 0x3 as u8;
 const SKIP_IF_NOT_EQUAL: u8 = 0x4 as u8;
 const SKIP_IF_REGISTER_EQUAL: u8 = 0x5 as u8;
-const SKIP_IF_REGISTER_NOT_EQUAL: u8 = 0x9 as u8;
-// Register Operations
 const REGISTER_OPERATION: u8 = 0x8 as u8;
+const SKIP_IF_REGISTER_NOT_EQUAL: u8 = 0x9 as u8;
+const STORE_ADDR_I: u8 = 0xA as u8;
+
+// Register Actions
 const REGISTER_STORE: u8 = 0x0 as u8;
 const REGISTER_OR: u8 = 0x1 as u8;
 const REGISTER_AND: u8 = 0x2 as u8;
@@ -35,7 +39,7 @@ const REGISTER_SHIFT_LEFT: u8 = 0xE as u8;
 
 impl CPU {
     pub fn new() -> Self {
-        CPU { registers: [0; 16], memory: [0; 4096], program_counter: 0, stack: [0; 16], stack_pointer: 0, }
+        CPU { registers: [0; 16], memory: [0; 4096], program_counter: 0, stack: [0; 16], stack_pointer: 0, i: 0, }
     }
 
     fn blank_program(&mut self) -> [u8; 3176] {
@@ -108,6 +112,7 @@ impl CPU {
                     }
 
                 }
+                STORE_ADDR_I => { self.store_register_i(addr); },
                 _ => unimplemented!("No imple for {:04x}", op_code),
             }
         }
