@@ -1,9 +1,14 @@
-mod register_operations;
-mod subroutine;
 mod comparison;
+mod subroutine;
+mod register_operations;
 
-use std::fmt;
-
+pub struct CPU {
+    registers: [u8; 16],
+    memory: [u8; 4096],
+    cur_pos: usize,
+    stack: [u16; 16],
+    cur_stack: usize,
+}
 const PROGRAM_START_ADDR: usize = 0x200 as usize;
 
 const MISC: u8 = 0x0 as u8;
@@ -26,13 +31,6 @@ const REGISTER_SHIFT_RIGHT: u8 = 0x6 as u8;
 const REGISTER_SUBN: u8 = 0x7 as u8;
 const REGISTER_SHIFT_LEFT: u8 = 0xE as u8;
 
-pub struct CPU {
-    registers: [u8; 16],
-    memory: [u8; 4096],
-    cur_pos: usize,
-    stack: [u16; 16],
-    cur_stack: usize,
-}
 
 impl CPU {
     pub fn new() -> Self {
