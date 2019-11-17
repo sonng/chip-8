@@ -2,23 +2,23 @@ use super::CPU;
 
 impl CPU {
     pub(super) fn call(&mut self, addr: u16) {
-        if self.cur_stack >= self.stack.len() {
+        if self.stack_pointer >= self.stack.len() {
             panic!("No more space on the stack");
         }
 
-        self.stack[self.cur_stack] = self.program_counter as u16;
-        self.cur_stack += 1;
+        self.stack[self.stack_pointer] = self.program_counter as u16;
+        self.stack_pointer += 1;
         self.program_counter = addr as usize;
     }
 
     pub(super) fn ret(&mut self) {
-        if self.cur_stack <= 0 {
+        if self.stack_pointer <= 0 {
             panic!("No more subroutine to return to");
         }
 
-        self.cur_stack -= 1;
-        self.program_counter = self.stack[self.cur_stack] as usize;
-        self.stack[self.cur_stack] = 0;
+        self.stack_pointer -= 1;
+        self.program_counter = self.stack[self.stack_pointer] as usize;
+        self.stack[self.stack_pointer] = 0;
     }
 
     pub(super) fn jump(&mut self, addr: u16) {

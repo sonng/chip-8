@@ -7,7 +7,7 @@ pub struct CPU {
     memory: [u8; 4096],
     program_counter: usize,
     stack: [u16; 16],
-    cur_stack: usize,
+    stack_pointer: usize,
 }
 
 const PROGRAM_START_ADDR: usize = 0x200 as usize;
@@ -35,7 +35,7 @@ const REGISTER_SHIFT_LEFT: u8 = 0xE as u8;
 
 impl CPU {
     pub fn new() -> Self {
-        CPU { registers: [0; 16], memory: [0; 4096], program_counter: 0, stack: [0; 16], cur_stack: 0, }
+        CPU { registers: [0; 16], memory: [0; 4096], program_counter: 0, stack: [0; 16], stack_pointer: 0, }
     }
 
     fn blank_program(&mut self) -> [u8; 3176] {
