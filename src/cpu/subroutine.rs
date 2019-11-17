@@ -6,9 +6,9 @@ impl CPU {
             panic!("No more space on the stack");
         }
 
-        self.stack[self.cur_stack] = self.cur_pos as u16;
+        self.stack[self.cur_stack] = self.program_counter as u16;
         self.cur_stack += 1;
-        self.cur_pos = addr as usize;
+        self.program_counter = addr as usize;
     }
 
     pub(super) fn ret(&mut self) {
@@ -17,12 +17,12 @@ impl CPU {
         }
 
         self.cur_stack -= 1;
-        self.cur_pos = self.stack[self.cur_stack] as usize;
+        self.program_counter = self.stack[self.cur_stack] as usize;
         self.stack[self.cur_stack] = 0;
     }
 
     pub(super) fn jump(&mut self, addr: u16) {
-        self.cur_pos = addr as usize;
+        self.program_counter = addr as usize;
     }
 }
 

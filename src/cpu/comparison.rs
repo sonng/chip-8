@@ -3,25 +3,25 @@ use super::CPU;
 impl CPU {
     pub(super) fn skip_if_equal(&mut self, x: usize, value: u8) {
         if self.registers[x] == value {
-            self.cur_pos += 2;
+            self.program_counter += 2;
         }
     }
 
     pub(super) fn skip_if_not_equal(&mut self, x: usize, value: u8) {
         if self.registers[x] != value {
-            self.cur_pos += 2;
+            self.program_counter += 2;
         }
     }
 
     pub(super) fn skip_if_registers_equal(&mut self, x: usize, y: usize) {
         if self.registers[x] == self.registers[y] {
-            self.cur_pos += 2;
+            self.program_counter += 2;
         }
     }
 
     pub(super) fn skip_if_registers_not_equal(&mut self, x: usize, y: usize) {
         if self.registers[x] != self.registers[y] {
-            self.cur_pos += 2;
+            self.program_counter += 2;
         }
     }
 }
