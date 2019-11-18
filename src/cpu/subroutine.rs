@@ -24,6 +24,11 @@ impl CPU {
     pub(super) fn jump(&mut self, addr: u16) {
         self.program_counter = addr as usize;
     }
+
+    pub(super) fn jump_add_v0(&mut self, addr: u16) {
+        let value = self.registers[0] as u16;
+        self.program_counter = (addr + value) as usize;
+    }
 }
 
 #[cfg(test)]
@@ -96,6 +101,21 @@ mod tests {
         assert_eq!(chip8.registers[0], 11);
         assert_eq!(chip8.registers[1], 6);
     }
-}
 
+    #[test]
+    fn test_register_jump() {
+        let mut chip8 = CPU::new();
+        let mut test = chip8.blank_program();
+
+        chip8.registers[0] = 2 as u8;
+
+        test[0] = 0xB2 as u8; test[1] = 0x00 as u8;
+
+        chip8.load(test);
+        assert_eq!(chip8.program_counter, 0x200);
+
+        chip8.run();
+        assert_eq!(chip8.program_counter, 0x204); // Reason for 0x204 because the program counter increases one more time to end the program
+    }
+}
 

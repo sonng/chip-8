@@ -24,6 +24,7 @@ const SKIP_IF_REGISTER_EQUAL: u8 = 0x5 as u8;
 const REGISTER_OPERATION: u8 = 0x8 as u8;
 const SKIP_IF_REGISTER_NOT_EQUAL: u8 = 0x9 as u8;
 const STORE_ADDR_I: u8 = 0xA as u8;
+const JUMP_ADDR_PLUS_V0: u8 = 0xB as u8;
 
 // Register Actions
 const REGISTER_STORE: u8 = 0x0 as u8;
@@ -113,6 +114,7 @@ impl CPU {
 
                 }
                 STORE_ADDR_I => { self.store_register_i(addr); },
+                JUMP_ADDR_PLUS_V0 => { self.jump_add_v0(addr); },
                 _ => unimplemented!("No imple for {:04x}", op_code),
             }
         }
