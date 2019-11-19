@@ -37,12 +37,12 @@ mod tests {
         chip8.set_seed([1, 2, 3, 4]);
         chip8.registers[0] = 5;
 
-        test[0] = 0xC0 as u8; test[1] = 0x02 as u8;
+        test[0] = 0xC0 as u8; test[1] = 0x07 as u8;
 
         chip8.load(test);
         assert_eq!(chip8.registers[0], 5);
 
         chip8.run();
-        assert_eq!(chip8.registers[0], 5);
+        assert_eq!(chip8.registers[0], 7);
     }
 }
