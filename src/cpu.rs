@@ -2,6 +2,11 @@ mod comparison;
 mod subroutine;
 mod register_operations;
 mod register_i;
+mod misc;
+
+extern crate rand;
+
+use rand::Rng;
 
 pub struct CPU {
     registers: [u8; 16],
@@ -10,6 +15,7 @@ pub struct CPU {
     stack: [u16; 16],
     stack_pointer: usize,
     i: u16,
+    seed: [u64; 4],
 }
 
 const PROGRAM_START_ADDR: usize = 0x200 as usize;
@@ -25,6 +31,7 @@ const REGISTER_OPERATION: u8 = 0x8 as u8;
 const SKIP_IF_REGISTER_NOT_EQUAL: u8 = 0x9 as u8;
 const STORE_ADDR_I: u8 = 0xA as u8;
 const JUMP_ADDR_PLUS_V0: u8 = 0xB as u8;
+const RANDOM_AND: u8 = 0xC as u8;
 
 // Register Actions
 const REGISTER_STORE: u8 = 0x0 as u8;
@@ -40,7 +47,22 @@ const REGISTER_SHIFT_LEFT: u8 = 0xE as u8;
 
 impl CPU {
     pub fn new() -> Self {
-        CPU { registers: [0; 16], memory: [0; 4096], program_counter: 0, stack: [0; 16], stack_pointer: 0, i: 0, }
+        let seeds: [u64; 4] = [
+            rand::thread_rng().gen::<u64>(),
+            rand::thread_rng().gen::<u64>(),
+            rand::thread_rng().gen::<u64>(),
+            rand::thread_rng().gen::<u64>(),
+        ];
+
+        CPU { 
+            registers: [0; 16], 
+            memory: [0; 4096], 
+            program_counter: 0, 
+            stack: [0; 16], 
+            stack_pointer: 0, 
+            i: 0,
+            seed: seeds,
+        }
     }
 
     fn blank_program(&mut self) -> [u8; 3176] {
@@ -59,6 +81,10 @@ impl CPU {
         }
 
         self.program_counter = PROGRAM_START_ADDR;
+    }
+    
+    fn set_seed(&mut self, seed: [u64; 4]) {
+        self.seed = seed;
     }
 
     pub fn run(&mut self) {
@@ -115,6 +141,7 @@ impl CPU {
                 }
                 STORE_ADDR_I => { self.store_register_i(addr); },
                 JUMP_ADDR_PLUS_V0 => { self.jump_add_v0(addr); },
+                RANDOM_AND => { self.random(x, byte); },
                 _ => unimplemented!("No imple for {:04x}", op_code),
             }
         }
