@@ -57,6 +57,20 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_store_register() {
+        let mut chip8 = CPU::new();
+        let mut test = chip8.blank_program();
+
+        test[0] = 0x60 as u8; test[1] = 0x21 as u8;
+
+        chip8.load(test);
+        assert_eq!(chip8.registers[0], 0);
+
+        chip8.run();
+        assert_eq!(chip8.registers[0], 0x21 as u8);
+    }
+
+    #[test]
     fn test_copy_register() {
         let mut chip8 = CPU::new();
         let mut test = chip8.blank_program();
