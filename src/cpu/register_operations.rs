@@ -1,6 +1,10 @@
 use super::CPU;
 
 impl CPU {
+    pub(super) fn store_register(&mut self, x: usize, value: u8) {
+        self.registers[x] = value;
+    }
+
     pub(super) fn copy(&mut self, x: usize, y: usize) {
         self.registers[x] = self.registers[y];
     }
