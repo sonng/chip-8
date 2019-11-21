@@ -5,6 +5,10 @@ impl CPU {
         self.registers[x] = value;
     }
 
+    pub(super) fn add_register(&mut self, x: usize, value: u8) {
+        self.registers[x] = self.registers[x] + value;
+    }
+
     pub(super) fn copy(&mut self, x: usize, y: usize) {
         self.registers[x] = self.registers[y];
     }
@@ -68,6 +72,21 @@ mod tests {
 
         chip8.run();
         assert_eq!(chip8.registers[0], 0x21 as u8);
+    }
+
+    #[test]
+    fn test_add_register() {
+        let mut chip8 = CPU::new();
+        let mut test = chip8.blank_program();
+
+        chip8.registers[0] = 2;
+        test[0] = 0x70 as u8; test[1] = 0x05 as u8;
+
+        chip8.load(test);
+        assert_eq!(chip8.registers[0], 2);
+
+        chip8.run();
+        assert_eq!(chip8.registers[0], 7);
     }
 
     #[test]

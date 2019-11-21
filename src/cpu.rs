@@ -30,6 +30,7 @@ const SKIP_IF_EQUAL: u8 = 0x3 as u8;
 const SKIP_IF_NOT_EQUAL: u8 = 0x4 as u8;
 const SKIP_IF_REGISTER_EQUAL: u8 = 0x5 as u8;
 const STORE_VALUE_TO_REGISTER: u8 = 0x6 as u8;
+const ADD_VALUE_TO_REGISTER: u8 = 0x7 as u8;
 const REGISTER_OPERATION: u8 = 0x8 as u8;
 const SKIP_IF_REGISTER_NOT_EQUAL: u8 = 0x9 as u8;
 const STORE_ADDR_I: u8 = 0xA as u8;
@@ -129,6 +130,7 @@ impl CPU {
                 SKIP_IF_REGISTER_EQUAL => { self.skip_if_registers_equal(x, y); },
                 SKIP_IF_REGISTER_NOT_EQUAL => { self.skip_if_registers_not_equal(x, y); },
                 STORE_VALUE_TO_REGISTER => { self.store_register(x, byte); },
+                ADD_VALUE_TO_REGISTER => { self.add_register(x, byte); },
                 REGISTER_OPERATION => {
 
                     match value {
